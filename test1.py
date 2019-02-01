@@ -1,4 +1,6 @@
 
+from configparser import ConfigParser
+
 
 def FieldChecker(a,b):
     if b.__contains__(a):
@@ -472,14 +474,16 @@ import csv
 import os
 import pandas as pd
 
-RequiredSeparator = input("Please Enter the Separator: ")
+parser = ConfigParser()
+parser.read('properties.config')
+RequiredSeparator = parser.get('Definition','separator')
 separator = ''
 if RequiredSeparator == '\\t':
     separator = '\t'
 else:
     separator = RequiredSeparator
 
-filepath='//Users//shreyas//Desktop//Mine//Eligibility_ETL'
+filepath=parser.get('Definition','OutputFilePath')
 if not os.path.exists(filepath):
     os.mkdir(filepath)
 
@@ -487,14 +491,12 @@ if not os.path.exists(filepath):
 
 Header = False
 Trailer = False
-HeaderInput = input("If Header Exist please Enter Y\n If not Please Enter N:")
-Header=checkInput(HeaderInput)
 
-TrailerInput = input("If Trailer Exist please Enter Y\n If not Please Enter N:")
-Trailer=checkInput(TrailerInput)
+Header=parser.get('Definition','Header')
+Trailer=parser.get('Definition','Trailer')
 
 
-ReadFilePath = '//Users//shreyas//Downloads//' + 'RecordDeclaration.csv'
+ReadFilePath = parser.get('Definition','RecordDeclaration')
 FieldNumbers=set()
 FieldPossibleValues={}
 Numbers1=[]
@@ -509,11 +511,8 @@ TotalValidFields={}
 TotalInvalidFields={}
 
 FileTrue=True
-print("Select the option for the following File Format")
-print("{:1} {:10}".format('1.','CSV'))
-print("{:1} {:100}".format('2.','Text File'))
-optionFile=int(input("Enter the Option:"))
-if optionFile==1:
+optionFile=parser.get('Definition','OutputFileFormat')
+if optionFile=='CSV':
     FileTrue=False
 
 
@@ -525,6 +524,7 @@ Numbers=file.readlines()[1].strip().split('\t')
 Traverse=0
 for i in Numbers:
     if str(i)=='':
+        print('Field Number for ' + Headers[Traverse] +' is not mentioned')
         AskFieldNumber=(input("Please give the Field Number for " + Headers[Traverse] +':' ))
         i=AskFieldNumber
 
@@ -620,22 +620,25 @@ for k in sorted(FieldNumbers):
     print("{:>36}{:>10} {:>10}".format(GetFieldName(k),FieldsWithNumbers[GetFieldName(k)],status))
 
 importantfields=[]
-SSNFieldNumber=int(input("Enter the SSN Field Number :"))
-if SSNFieldNumber not in FieldNumbers:
+
+SSNFieldNumber=int(parser.get('Definition','SSNFieldNumber'))
+if not FieldNumbers.__contains__(SSNFieldNumber):
     print("provided  SSN Number is not mentioned in CSV.Please Check")
+    exit()
 importantfields.append(SSNFieldNumber)
-SubscriberSSNFieldNumber=int(input("Enter the SubscriberSSN field Number :"))
-if SubscriberSSNFieldNumber not in FieldNumbers:
+SubscriberSSNFieldNumber=int(parser.get('Definition','SubscriberSSNFieldNumber'))
+if not FieldNumbers.__contains__(SubscriberSSNFieldNumber):
     print("provided Subscriber SSN Number is not mentioned in CSV.Please Check")
+    exit()
 importantfields.append(SubscriberSSNFieldNumber)
-RelationshipCodeNumber= int(input("Enter the Relationship Code Field Number :"))
-if RelationshipCodeNumber not in FieldNumbers:
+RelationshipCodeNumber= int(parser.get('Definition','RelationshipCodeNumber'))
+if not FieldNumbers.__contains__(RelationshipCodeNumber):
     print("provided Relationship Code Number is not present in CSV.Please check")
+    exit()
 importantfields.append(RelationshipCodeNumber)
-RequiredImportant=min(importantfields)
 
 
-print("Select the appropriate Following Number (1,2,3,4,5) according to your requirement:\n")
+print("Select the appropriate Following Number (1,2,3,4) according to your requirement:\n")
 print("{:1} {:30}".format('1.','only Positive Records'))
 print("{:1} {:30}".format('2.','only Invalid/Negative Records'))
 print("{:1} {:30}".format('3.','only Blank Records'))
