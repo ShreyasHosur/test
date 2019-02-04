@@ -1,6 +1,7 @@
 
 from configparser import ConfigParser
 
+print('hello')
 
 def FieldChecker(a,b):
     if b.__contains__(a):
