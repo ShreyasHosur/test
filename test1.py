@@ -1,7 +1,6 @@
 
 from configparser import ConfigParser
 
-print('hello')
 
 def FieldChecker(a,b):
     if b.__contains__(a):
@@ -43,7 +42,7 @@ def CsvConvert(Record,filename):
         TrailerFilenamecsv=TrailerfileName + '//NoTrailer.csv'
         Record1.pop(-1)
         with open(TrailerFilenamecsv, 'w') as csvFile:
-            writer = csv.writer(csvFile, delimiter='|')
+            writer = csv.writer(csvFile, delimiter=separator)
             writer.writerows(Record1)
         csvFile.close()
 
@@ -180,11 +179,10 @@ def PositiveRecords(Header,Trailer,MandatoryFields,TotalValidFields,TotalInvalid
 
             filename1= fileDirectory1 + '//' + str(j+1)
             if Header:
-                HeaderList = []
-                HeaderList.append('Header')
+                global HeaderList
+                global FileHeaderText
                 CSVRecord.append(HeaderList)
-                appendstring = "Header" + "\n"
-                FileRecord.append(appendstring)
+                FileRecord.append(FileHeaderText)
             employeeflag=False
             RC = TotalValidFields[RelationshipCodeNumber][ValidCounter[RelationshipCodeNumber]]
             if RC == '01' or RC == '1':
@@ -251,12 +249,10 @@ def PositiveRecords(Header,Trailer,MandatoryFields,TotalValidFields,TotalInvalid
 
             CSVRecord.append(RecordFieldList)
             if Trailer:
-                TrailerCase=True
-                TrailerRecord = []
-                appendstring = "\n" + "Trailer"
-                TrailerRecord.append('Trailer')
-                CSVRecord.append(TrailerRecord)
-                FileRecord.append(appendstring)
+                global TrailerList
+                global FileTrailerText
+                CSVRecord.append(TrailerList)
+                FileRecord.append(FileTrailerText)
             if FileTrue:
                 FileConvert(FileRecord, filename1)
             else:
@@ -282,11 +278,10 @@ def InvalidNonMandatoryRecords(Header,Trailer,MandatoryFields,TotalValidFields,T
                     os.mkdir(fileDirectory1)
                 filename1 = fileDirectory1 + '//' + str(j + 1)
                 if Header:
-                    HeaderList = []
-                    HeaderList.append('Header')
+                    global HeaderList
+                    global FileHeaderText
                     CSVRecord.append(HeaderList)
-                    appendstring = "Header" + "\n"
-                    FileRecord.append(appendstring)
+                    FileRecord.append(FileHeaderText)
 
                 employeeflag=False
                 RC = TotalValidFields[RelationshipCodeNumber][ValidCounter[RelationshipCodeNumber]]
@@ -352,11 +347,10 @@ def InvalidNonMandatoryRecords(Header,Trailer,MandatoryFields,TotalValidFields,T
                             FileRecord.append(separator)
                 CSVRecord.append(RecordFieldList)
                 if Trailer:
-                    TrailerRecord = []
-                    appendstring = "\n" + "Trailer"
-                    TrailerRecord.append('Trailer')
-                    CSVRecord.append(TrailerRecord)
-                    FileRecord.append(appendstring)
+                    global TrailerList
+                    global FileTrailerText
+                    CSVRecord.append(TrailerList)
+                    FileRecord.append(FileTrailerText)
                 if FileTrue:
                     FileConvert(FileRecord, filename1)
                 else:
@@ -386,11 +380,10 @@ def NegativeMandatoryRecords(Header,Trailer,MandatoryFields,TotalValidFields,Tot
             FileRecord=[]
             filename1 = fileDirectory1 +  '//' +str(count+1)
             if Header:
-                HeaderList=[]
-                HeaderList.append('Header')
+                global HeaderList
+                global FileHeaderText
                 CSVRecord.append(HeaderList)
-                appendstring="Header" + "\n"
-                FileRecord.append(appendstring)
+                FileRecord.append(FileHeaderText)
             RecordFieldList = []
             for j in range(1,TotalFieldsNumber+1):
                 if j==MandatoryFieldNumber:
@@ -407,11 +400,10 @@ def NegativeMandatoryRecords(Header,Trailer,MandatoryFields,TotalValidFields,Tot
                     RecordFieldList.append(str(TotalValidFields[j][0]))
             CSVRecord.append(RecordFieldList)
             if Trailer:
-                TrailerRecord=[]
-                appendstring="\n" + "Trailer"
-                TrailerRecord.append('Trailer')
-                CSVRecord.append(TrailerRecord)
-                FileRecord.append(appendstring)
+                global TrailerList
+                global FileTrailerText
+                CSVRecord.append(TrailerList)
+                FileRecord.append(FileTrailerText)
             if FileTrue:
                 FileConvert(FileRecord, filename1)
             else:
@@ -442,11 +434,10 @@ def BlankRecord(Header, Trailer,MandatoryFields,TotalValidFields,RequiredFieldFl
         filename1=fileDirectory1+'//'+ str(Count)
         Count=Count+1
         if Header:
-            HeaderList = []
-            HeaderList.append('Header')
+            global HeaderList
+            global FileHeaderText
             CSVRecord.append(HeaderList)
-            appendstring = "Header" + "\n"
-            FileRecord.append(appendstring)
+            FileRecord.append(FileHeaderText)
 
         RecordFieldList = []
         for j in range(1,TotalFieldsNumber+1):
@@ -460,11 +451,10 @@ def BlankRecord(Header, Trailer,MandatoryFields,TotalValidFields,RequiredFieldFl
         CSVRecord.append(RecordFieldList)
 
         if Trailer:
-            TrailerRecord=[]
-            appendstring = "\n" + "Trailer"
-            TrailerRecord.append('Trailer')
-            CSVRecord.append(TrailerRecord)
-            FileRecord.append(appendstring)
+            global TrailerList
+            global FileTrailerText
+            CSVRecord.append(TrailerList)
+            FileRecord.append(FileTrailerText)
         if FileTrue:
             FileConvert(FileRecord, filename1)
         else:
@@ -516,8 +506,32 @@ optionFile=parser.get('Definition','OutputFileFormat')
 if optionFile=='CSV':
     FileTrue=False
 
+HeaderList=[]
+TrailerList=[]
+FileHeaderText="Header" + "\n"
+FileTrailerText="\n" + "Trailer"
+CSVHeaderText="Header"
+CSVTrailerText="Trailer"
+DefaultHeader=False
+DefaultTrailer=False
+DefaultHeader=parser.getboolean('Definition','DefaultHeader')
+DefaultTrailer=parser.getboolean('Definition','DefaultTrailer')
 
+if Header and DefaultHeader:
+    DefaultHeaderPath=parser.get('Definition','DefaultHeaderPath')
+    HeaderFile=open(DefaultHeaderPath,'r')
+    CSVHeaderText=HeaderFile.readline().strip()
+    FileHeaderText=CSVHeaderText+'\n'
 
+HeaderList.append(CSVHeaderText)
+
+if Trailer and DefaultTrailer:
+    DefaultTrailerPath=parser.get('Definition','DefaultTrailerPath')
+    TrailerFile=open(DefaultTrailerPath,'r')
+    CSVTrailerText=TrailerFile.readline().strip()
+    FileTrailerText='\n'+ CSVTrailerText
+
+TrailerList.append(CSVTrailerText)
 
 file=open(ReadFilePath,'r')
 Headers=file.readline().strip().split('\t')
