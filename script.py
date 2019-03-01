@@ -103,7 +103,7 @@ def MethodCall(option):
         return True
     elif option==2:
         dummy=[]
-        RequiredFields = input("Please give the Field Numbers in comma separated(1,2,3) for the required Negative Field((Only For Mandatory Fields will be done):")
+        RequiredFields = input("Please give the Field Numbers in comma separated(1,2,3) for the required Negative Field((Only For Mandatory Fields will be done) and give '0' for all Fields::")
         RequiredFieldsList = RequiredFields.split(',')
         if len(RequiredFieldsList) == 1 and RequiredFieldsList[0] == '0':
             NegativeMandatoryRecords(Header, Trailer, MandatoryFields, TotalValidFields, TotalInvalidFields,
@@ -113,7 +113,7 @@ def MethodCall(option):
         return True
     elif option==3:
         dummy=[]
-        RequiredFields = input("Please give the Field Numbers in comma separated(1,2,3) for the required Blank Field(Only For Mandatory Fields will be done):")
+        RequiredFields = input("Please give the Field Numbers in comma separated(1,2,3) for the required Blank Field(Only For Mandatory Fields will be done) and give '0' for all Fields::")
         RequiredFieldsList = RequiredFields.split(',')
         if len(RequiredFieldsList) == 1 and RequiredFieldsList[0] == '0':
             BlankRecord(Header, Trailer, MandatoryFields, TotalValidFields, False, dummy)
